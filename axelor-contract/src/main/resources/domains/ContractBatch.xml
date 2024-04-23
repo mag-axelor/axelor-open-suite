@@ -15,6 +15,9 @@
       mappedBy="contractBatch" title="Batchs"/>
     <integer name="targetTypeSelect" title="Type" selection="contract.target.type.select"/>
     <date name="invoicingDate" title="Invoicing date"/>
+    
+    <integer name="duration" title="Duration"/>
+    <integer name="periodTypeSelect" title="Period Type" selection="contract.period.type.select"/>
 
     <extra-code><![CDATA[
         public static final int INVOICING = 1;
@@ -22,6 +25,11 @@
         public static final int CURRENT_VERSION_ACTIVATION = 3;
         public static final int NEXT_VERSION_ACTIVATION = 4;
         public static final int REVALUATE_CONTRACTS = 5;
+        public static final int REMINDER_END_OF_CONTRACTS = 6;
+
+        public static final int DAYS_PERIOD = 1;
+        public static final int WEEKS_PERIOD = 2;
+        public static final int MONTHS_PERIOD = 3;
       ]]></extra-code>
   </entity>
 

@@ -19,6 +19,12 @@
 
     <boolean name="isConfigContract" title="Configurable contract"/>
 
+    <integer name="duration" title="Duration" min="0"/>
+    <integer name="periodTypeSelect" title="Period Type" selection="contract.period.type.select" default="1"/>
+
+    <many-to-one name="contractMessageTemplate" ref="com.axelor.message.db.Template"
+                 title="Message template for contract"/>
+
     <track>
       <field name="isUnchangableContract" on="UPDATE"/>
       <field name="isAmendmentManagement" on="UPDATE"/>
@@ -27,6 +33,9 @@
       <field name="isConsumptionManagement" on="UPDATE"/>
       <field name="isAdditionalBenefitManagement" on="UPDATE"/>
       <field name="isConfigContract" on="UPDATE"/>
+      <field name="duration" on="UPDATE"/>
+      <field name="periodTypeSelect" on="UPDATE"/>
+      <field name="contractMessageTemplate" on="UPDATE"/>
     </track>
   </entity>
 

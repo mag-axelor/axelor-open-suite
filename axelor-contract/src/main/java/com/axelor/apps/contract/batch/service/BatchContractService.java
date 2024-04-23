@@ -23,6 +23,7 @@ import com.axelor.apps.base.db.Batch;
 import com.axelor.apps.base.service.administration.AbstractBatchService;
 import com.axelor.apps.contract.batch.BatchContract;
 import com.axelor.apps.contract.batch.BatchContractInvoicing;
+import com.axelor.apps.contract.batch.BatchContractReminderMail;
 import com.axelor.apps.contract.batch.BatchContractRevaluate;
 import com.axelor.apps.contract.db.ContractBatch;
 import com.axelor.apps.contract.db.repo.ContractBatchRepository;
@@ -49,6 +50,11 @@ public class BatchContractService extends AbstractBatchService {
       case ContractBatchRepository.INVOICING:
         batch = invoiceContracts(contractBatch);
         break;
+
+      case ContractBatchRepository.REMINDER_END_OF_CONTRACTS:
+        batch = sendActiveContractsReminderMail(contractBatch);
+        break;
+
       default:
         batch = Beans.get(BatchContract.class).run(contractBatch);
     }
@@ -69,5 +75,9 @@ public class BatchContractService extends AbstractBatchService {
       batch = Beans.get(BatchContract.class).run(contractBatch);
     }
     return batch;
+  }
+
+  protected Batch sendActiveContractsReminderMail(ContractBatch contractBatch) {
+    return Beans.get(BatchContractReminderMail.class).run(contractBatch);
   }
 }

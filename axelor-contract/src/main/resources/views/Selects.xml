@@ -33,6 +33,12 @@
     <option value="2">Supplier</option>
   </selection>
 
+  <selection name="contract.period.type.select">
+    <option value="1">Days</option>
+    <option value="2">Weeks</option>
+    <option value="3">Months</option>
+  </selection>
+
   <selection name="sequence.generic.code.select"
     id="contract.sequence.generic.code.select">
     <option value="customerContract">Customer contracts</option>
@@ -52,6 +58,7 @@
     <option value="3">Current version activation</option>
     <option value="4">Next version activation</option>
     <option value="5">Revaluate contracts</option>
+    <option value="6">Reminder end of contracts</option>
   </selection>
 
   <selection name="account.analytic.move.line.type.select"
