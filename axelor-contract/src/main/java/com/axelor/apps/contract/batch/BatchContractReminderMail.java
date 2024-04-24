@@ -16,6 +16,7 @@ import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
 import com.axelor.message.db.Template;
 import com.axelor.message.service.TemplateMessageService;
+import com.axelor.meta.CallMethod;
 import com.axelor.studio.db.AppContract;
 import com.google.inject.Inject;
 
@@ -47,25 +48,49 @@ public class BatchContractReminderMail extends AbstractBatch {
         this.templateMessageService = templateMessageService;
     }
 
+    @CallMethod
+    public LocalDate getEndOfPeriod() {
+        AppContract appContract = (AppContract) appBaseService.getApp("contract");
+        Integer duration = appContract.getDuration();
+        Integer periodType = appContract.getPeriodTypeSelect();
+        LocalDate date = LocalDate.now();
+
+        switch (periodType) {
+            case ContractBatchRepository.DAYS_PERIOD:
+                date = date.plusDays(duration);
+                break;
+
+            case ContractBatchRepository.WEEKS_PERIOD:
+                date = date.plusWeeks(duration);
+                break;
+
+            case ContractBatchRepository.MONTHS_PERIOD:
+                date = date.plusMonths(duration);
+                break;
+        }
+
+        return date;
+    }
+
     protected LocalDate getEndOfPeriod(ContractBatch contractBatch) {
-        LocalDate today = LocalDate.now();
+        LocalDate date = LocalDate.now();
         Integer duration = contractBatch.getDuration();
 
         switch (contractBatch.getPeriodTypeSelect()) {
             case ContractBatchRepository.DAYS_PERIOD:
-                today = today.plusDays(duration);
+                date = date.plusDays(duration);
                 break;
 
             case ContractBatchRepository.WEEKS_PERIOD:
-                today = today.plusWeeks(duration);
+                date = date.plusWeeks(duration);
                 break;
 
             case ContractBatchRepository.MONTHS_PERIOD:
-                today = today.plusMonths(duration);
+                date = date.plusMonths(duration);
                 break;
         }
 
-        return today;
+        return date;
     }
 
     @Override

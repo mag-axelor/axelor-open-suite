@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object-views xmlns="http://axelor.com/xml/ns/object-views"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_6.1.xsd">
+
+    <dashboard title="Dashboard" name="contract.dashboard.home">
+        <dashlet colSpan="12" action="contract.dashboard.view"/>
+    </dashboard>
+
+    <action-view name="contract.dashboard.view" title="Activated contracts"
+                 model="com.axelor.apps.contract.db.Contract" home="true">
+        <view type="grid" name="contract-grid"/>
+        <domain>self.currentContractVersion.activatedByUser = :_connectedUser AND :_todayWithPeriod >= self.currentContractVersion.supposedEndDate</domain>
+        <context name="_connectedUser" expr="eval: __user__"/>
+        <context name="_todayWithPeriod"
+                 expr="call:com.axelor.apps.contract.batch.BatchContractReminderMail:getEndOfPeriod()"/>
+    </action-view>
+
+</object-views>
