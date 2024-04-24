@@ -3,7 +3,6 @@ package com.axelor.apps.contract.batch;
 import com.axelor.apps.base.db.repo.BatchRepository;
 import com.axelor.apps.base.service.administration.AbstractBatch;
 import com.axelor.apps.base.service.app.AppBaseService;
-import com.axelor.apps.base.service.app.AppBaseServiceImpl;
 import com.axelor.apps.base.service.exception.TraceBackService;
 import com.axelor.apps.contract.db.ContractBatch;
 import com.axelor.apps.contract.db.ContractVersion;
@@ -15,12 +14,9 @@ import com.axelor.apps.contract.translation.ITranslation;
 import com.axelor.db.JPA;
 import com.axelor.db.Query;
 import com.axelor.i18n.I18n;
-import com.axelor.inject.Beans;
 import com.axelor.message.db.Template;
 import com.axelor.message.service.TemplateMessageService;
-import com.axelor.studio.app.service.AppService;
 import com.axelor.studio.db.AppContract;
-import com.axelor.studio.db.repo.AppContractRepository;
 import com.google.inject.Inject;
 
 import java.time.LocalDate;
@@ -32,8 +28,8 @@ public class BatchContractReminderMail extends AbstractBatch {
     protected ContractVersionRepository contractVersionRepository;
     protected ContractService contractService;
     protected ContractBatchRepository contractBatchRepository;
-    protected AppService appService;
     protected AppBaseService appBaseService;
+    protected TemplateMessageService templateMessageService;
 
     @Inject
     public BatchContractReminderMail(
@@ -41,14 +37,14 @@ public class BatchContractReminderMail extends AbstractBatch {
             ContractVersionRepository contractVersionRepository,
             ContractService contractService,
             ContractBatchRepository contractBatchRepository,
-            AppService appService,
-            AppBaseService appBaseService) {
+            AppBaseService appBaseService,
+            TemplateMessageService templateMessageService) {
         this.contractRepository = contractRepository;
         this.contractVersionRepository = contractVersionRepository;
         this.contractService = contractService;
         this.contractBatchRepository = contractBatchRepository;
-        this.appService = appService;
         this.appBaseService = appBaseService;
+        this.templateMessageService = templateMessageService;
     }
 
     protected LocalDate getEndOfPeriod(ContractBatch contractBatch) {
@@ -76,6 +72,7 @@ public class BatchContractReminderMail extends AbstractBatch {
     protected void process() {
         List<ContractVersion> contractVersionList;
         int offset = 0;
+
         AppContract appContract = (AppContract) appBaseService.getApp("contract");
         Template template = appContract.getContractMessageTemplate();
 
@@ -88,8 +85,7 @@ public class BatchContractReminderMail extends AbstractBatch {
         while (!(contractVersionList = query.fetch(FETCH_LIMIT, offset)).isEmpty()) {
             for (ContractVersion contractVersion : contractVersionList) {
                 try {
-                    Beans.get(TemplateMessageService.class)
-                            .generateAndSendMessage(contractVersion, template);
+                    templateMessageService.generateAndSendMessage(contractVersion, template);
                     incrementDone();
                 } catch (Exception e) {
                     incrementAnomaly();
