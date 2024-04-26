@@ -39,4 +39,6 @@ public interface SaleOrderSupplychainService {
   public void setAdvancePayment(SaleOrder saleOrder);
 
   public void updateTimetableAmounts(SaleOrder saleOrder);
+
+  public void setDefaultStockLocation(SaleOrder saleOrder);
 }

@@ -52,6 +52,7 @@
       if="__config__.app.isApp('budget')"/>
     <action name="action-method-budget-sale-order-validate-budget-balance"
       if="__config__.app.isApp('budget')"/>
+    <action name="action-sale-order-group-confirm-order"/>
     <action name="action-sale-group-confirmed"/>
   </action-group>
 

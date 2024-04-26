@@ -33,7 +33,8 @@
         <field name="periodTypeSelect" colSpan="6" widget="single-select"/>
       </panel>
       <panel name="templatePanel" title="Template" colSpan="12" hidden="true" showIf="isConfigContract">
-        <field name="contractMessageTemplate" domain="self.metaModel = 452 OR self.metaModel = 456"/>
+        <field name="contractMessageTemplate" domain="self.metaModel.name = 'ContractVersion' OR self.metaModel = 'Contract'"
+               form-view="template-form"/>
       </panel>
     </panel>
 

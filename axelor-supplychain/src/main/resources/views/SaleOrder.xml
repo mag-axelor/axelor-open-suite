@@ -20,6 +20,9 @@
       <attribute name="onChange" value="supplychain-action-create-shipment-cost-line"/>
       <attribute name="readOnlyIf" value="statusSelect &gt; 1"/>
     </extend>
+    <extend target="//panel[@name='actionsPanel']/button[@name='confirmOrderBtn']">
+      <attribute name="onClick" value="action-sale-order-group-confirm-order"/>
+    </extend>
   </form>
 
   <form name="sale-order-form-partner" title="Sale order"
@@ -142,6 +145,11 @@
       name="action-supplychain-sale-order-generate-purchase-orders-from-selected-SOLines"/>
   </action-group>
 
+  <action-group name="action-sale-order-group-confirm-order">
+    <action name="action-sale-order-validate-check-sale-order-line-on-confirm"/>
+    <action name="action-supplychain-so-method-set-default-stock-location-on-solines"/>
+  </action-group>
+
   <!-- ACTION METHOD -->
 
   <action-method name="action-supplychain-sale-order-method-get-stock-location">
@@ -177,12 +185,24 @@
       method="setNextInvoicingStartPeriodDate"/>
   </action-method>
 
+  <action-method name="action-supplychain-so-method-set-default-stock-location-on-solines">
+    <call class="com.axelor.apps.supplychain.web.SaleOrderController"
+          method="setDefaultStockLocation"/>
+  </action-method>
+
   <!-- ACTION VALIDATE -->
 
   <action-validate
     name="action-supplychain-sale-order-validate-check-amount-timetable">
     <alert message="The amount to be spread over the timetable is negative."
       if="amountToBeSpreadOverTheTimetable &lt; 0"/>
+  </action-validate>
+  
+  <action-validate name="action-sale-order-validate-check-sale-order-line-on-confirm">
+    <error message="At least one sale order line has an empty stock location and the sale order has an empty stock location too. Please correct at least one of those errors."
+           if="saleOrderLineList?.any{it?.typeSelect == 0 &amp;&amp; it?.stockLocation == null} &amp;&amp; stockLocation == null"/>
+    <alert message="At least one sale order line has an empty stock location, if you continue they will be filled automatically."
+           if="saleOrderLineList?.any{it?.typeSelect == 0 &amp;&amp; it?.stockLocation == null}"/>
   </action-validate>
 
   <!-- ACTION RECORD -->

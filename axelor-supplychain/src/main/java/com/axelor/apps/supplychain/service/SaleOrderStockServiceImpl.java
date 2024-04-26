@@ -55,12 +55,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SaleOrderStockServiceImpl implements SaleOrderStockService {
@@ -127,27 +122,38 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
 
     List<Long> stockMoveList = new ArrayList<>();
 
+    Map<StockLocation, List<SaleOrderLine>> saleOrderLinePerStockLocationMap =
+            getAllSaleOrderLinePerStockLocation(saleOrder);
+
     Map<LocalDate, List<SaleOrderLine>> saleOrderLinePerDateMap =
         getAllSaleOrderLinePerDate(saleOrder);
 
-    for (LocalDate estimatedDeliveryDate :
-        saleOrderLinePerDateMap.keySet().stream()
-            .filter(Objects::nonNull)
-            .sorted((x, y) -> x.compareTo(y))
-            .collect(Collectors.toList())) {
+    for (StockLocation stockLocation :
+            saleOrderLinePerStockLocationMap.keySet().stream()
+                    .filter(Objects::nonNull)
+                    .sorted(Comparator.comparing(StockLocation::getId))
+                    .collect(Collectors.toList())) {
 
-      List<SaleOrderLine> saleOrderLineList = saleOrderLinePerDateMap.get(estimatedDeliveryDate);
+      for (LocalDate estimatedDeliveryDate :
+              saleOrderLinePerDateMap.keySet().stream()
+                      .filter(Objects::nonNull)
+                      .sorted(LocalDate::compareTo)
+                      .collect(Collectors.toList())) {
 
-      Optional<StockMove> stockMove =
-          createStockMove(saleOrder, estimatedDeliveryDate, saleOrderLineList);
+        List<SaleOrderLine> saleOrderLineList = saleOrderLinePerDateMap.get(estimatedDeliveryDate);
 
-      stockMove.map(StockMove::getId).ifPresent(stockMoveList::add);
+        Optional<StockMove> stockMove =
+                createStockMove(saleOrder, estimatedDeliveryDate, stockLocation, saleOrderLineList);
+
+        stockMove.ifPresent(move -> move.setFromStockLocation(stockLocation));
+        stockMove.map(StockMove::getId).ifPresent(stockMoveList::add);
+      }
     }
     Optional<List<SaleOrderLine>> saleOrderLineList =
         Optional.ofNullable(saleOrderLinePerDateMap.get(null));
     if (saleOrderLineList.isPresent()) {
 
-      Optional<StockMove> stockMove = createStockMove(saleOrder, null, saleOrderLineList.get());
+      Optional<StockMove> stockMove = createStockMove(saleOrder, null, null, saleOrderLineList.get());
 
       stockMove.map(StockMove::getId).ifPresent(stockMoveList::add);
     }
@@ -155,8 +161,9 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
   }
 
   protected Optional<StockMove> createStockMove(
-      SaleOrder saleOrder, LocalDate estimatedDeliveryDate, List<SaleOrderLine> saleOrderLineList)
-      throws AxelorException {
+          SaleOrder saleOrder, LocalDate estimatedDeliveryDate,
+          StockLocation stockLocation, List<SaleOrderLine> saleOrderLineList)
+          throws AxelorException {
     Company company = saleOrder.getCompany();
     StockMove stockMove = this.createStockMove(saleOrder, company, estimatedDeliveryDate);
     stockMove.setDeliveryCondition(saleOrder.getDeliveryCondition());
@@ -164,21 +171,22 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
     StockLocation toStockLocation = saleOrder.getToStockLocation();
     if (toStockLocation == null) {
       toStockLocation =
-          partnerStockSettingsService.getDefaultExternalStockLocation(
-              saleOrder.getClientPartner(), company, null);
+              partnerStockSettingsService.getDefaultExternalStockLocation(
+                      saleOrder.getClientPartner(), company, null);
     }
     if (toStockLocation == null) {
       toStockLocation =
-          stockConfigService.getCustomerVirtualStockLocation(
-              stockConfigService.getStockConfig(company));
+              stockConfigService.getCustomerVirtualStockLocation(
+                      stockConfigService.getStockConfig(company));
     }
 
     for (SaleOrderLine saleOrderLine : saleOrderLineList) {
       if (saleOrderLine.getProduct() != null) {
         BigDecimal qty = saleOrderLineServiceSupplyChain.computeUndeliveredQty(saleOrderLine);
         if (qty.signum() > 0 && !existActiveStockMoveForSaleOrderLine(saleOrderLine)) {
-          createStockMoveLine(
-              stockMove, saleOrderLine, qty, saleOrder.getStockLocation(), toStockLocation);
+          if (saleOrderLine.getStockLocation() == stockLocation)
+            createStockMoveLine(
+                    stockMove, saleOrderLine, qty, stockLocation, toStockLocation);
         }
       }
     }
@@ -188,11 +196,11 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
     }
 
     if (stockMove.getStockMoveLineList().stream()
-        .noneMatch(
-            stockMoveLine ->
-                stockMoveLine.getSaleOrderLine() != null
-                    && stockMoveLine.getSaleOrderLine().getTypeSelect()
-                        == SaleOrderLineRepository.TYPE_NORMAL)) {
+            .noneMatch(
+                    stockMoveLine ->
+                            stockMoveLine.getSaleOrderLine() != null
+                                    && stockMoveLine.getSaleOrderLine().getTypeSelect()
+                                    == SaleOrderLineRepository.TYPE_NORMAL)) {
       stockMove.setFullySpreadOverLogisticalFormsFlag(true);
     }
 
@@ -201,29 +209,44 @@ public class SaleOrderStockServiceImpl implements SaleOrderStockService {
 
     if (isNeedingConformityCertificate) {
       stockMove.setSignatoryUser(
-          stockConfigService.getStockConfig(stockMove.getCompany()).getSignatoryUser());
+              stockConfigService.getStockConfig(stockMove.getCompany()).getSignatoryUser());
     }
 
     SupplyChainConfig supplychainConfig =
-        supplyChainConfigService.getSupplyChainConfig(saleOrder.getCompany());
+            supplyChainConfigService.getSupplyChainConfig(saleOrder.getCompany());
 
     if (supplychainConfig.getDefaultEstimatedDate() != null
-        && supplychainConfig.getDefaultEstimatedDate() == SupplyChainConfigRepository.CURRENT_DATE
-        && stockMove.getEstimatedDate() == null) {
+            && supplychainConfig.getDefaultEstimatedDate() == SupplyChainConfigRepository.CURRENT_DATE
+            && stockMove.getEstimatedDate() == null) {
       stockMove.setEstimatedDate(appBaseService.getTodayDate(saleOrder.getCompany()));
     } else if (supplychainConfig.getDefaultEstimatedDate()
             == SupplyChainConfigRepository.CURRENT_DATE_PLUS_DAYS
-        && stockMove.getEstimatedDate() == null) {
+            && stockMove.getEstimatedDate() == null) {
       stockMove.setEstimatedDate(
-          appBaseService
-              .getTodayDate(saleOrder.getCompany())
-              .plusDays(supplychainConfig.getNumberOfDays().longValue()));
+              appBaseService
+                      .getTodayDate(saleOrder.getCompany())
+                      .plusDays(supplychainConfig.getNumberOfDays().longValue()));
     }
 
     setReservationDateTime(stockMove, saleOrder);
     stockMoveService.planWithNoSplit(stockMove);
 
     return Optional.of(stockMove);
+  }
+
+  protected Map<StockLocation, List<SaleOrderLine>> getAllSaleOrderLinePerStockLocation(SaleOrder saleOrder) {
+    Map<StockLocation, List<SaleOrderLine>> saleOrderLinePerStockLocationMap = new HashMap<>();
+
+    for (SaleOrderLine saleOrderLine : saleOrder.getSaleOrderLineList()) {
+
+      StockLocation stockLocation = saleOrderLine.getStockLocation();
+
+      List<SaleOrderLine> saleOrderLineLists = saleOrderLinePerStockLocationMap.computeIfAbsent(stockLocation, k -> new ArrayList<>());
+
+      saleOrderLineLists.add(saleOrderLine);
+    }
+
+    return saleOrderLinePerStockLocationMap;
   }
 
   protected Map<LocalDate, List<SaleOrderLine>> getAllSaleOrderLinePerDate(SaleOrder saleOrder) {

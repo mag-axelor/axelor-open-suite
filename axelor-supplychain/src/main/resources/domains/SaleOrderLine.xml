@@ -54,6 +54,9 @@
 
     <integer name="standardDelay" title="Standard delay (days)" default="0"/>
 
+    <many-to-one name="stockLocation" ref="com.axelor.apps.stock.db.StockLocation"
+                 title="Stock location"/>
+
 
 
     <extra-code>

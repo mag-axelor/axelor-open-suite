@@ -103,7 +103,8 @@ public class BatchContractReminderMail extends AbstractBatch {
 
         Query<ContractVersion> query =
                 JPA.all(ContractVersion.class)
-                        .filter("self.supposedEndDate <= :endOfPeriod")
+                        .filter("self.statusSelect = :status AND self.supposedEndDate <= :endOfPeriod")
+                        .bind("status", ContractBatchRepository.CURRENT_VERSION_ACTIVATION)
                         .bind("endOfPeriod", getEndOfPeriod(batch.getContractBatch()))
                         .order("id");
 

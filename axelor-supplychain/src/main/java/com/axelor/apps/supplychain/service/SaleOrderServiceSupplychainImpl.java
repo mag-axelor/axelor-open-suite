@@ -442,4 +442,16 @@ public class SaleOrderServiceSupplychainImpl extends SaleOrderServiceImpl
     return stockLocation != null && saleOrderA2C != null && !saleOrderA2C.equals(stockLocationA2C)
         || stockLocation == null && saleOrderA2C != null && !saleOrderA2C.equals(companyA2C);
   }
+
+  @Override
+  @Transactional(rollbackOn = {Exception.class})
+  public void setDefaultStockLocation(SaleOrder saleOrder) {
+    List<SaleOrderLine> saleOrderLineList = saleOrder.getSaleOrderLineList();
+    if (saleOrderLineList != null) {
+      saleOrderLineList.stream()
+              .filter(sol -> sol.getTypeSelect() == 0 && sol.getStockLocation() == null)
+              .forEach(sol -> sol.setStockLocation(saleOrder.getStockLocation()));
+    }
+    saleOrderRepo.save(saleOrder);
+  }
 }

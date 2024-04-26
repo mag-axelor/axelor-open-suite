@@ -735,4 +735,15 @@ public class SaleOrderController {
       TraceBackService.trace(response, e);
     }
   }
+
+  public void setDefaultStockLocation(ActionRequest request, ActionResponse response) {
+    try {
+      SaleOrder saleOrder = request.getContext().asType(SaleOrder.class);
+      Beans.get(SaleOrderSupplychainService.class)
+              .setDefaultStockLocation(Beans.get(SaleOrderRepository.class).find(saleOrder.getId()));
+      response.setReload(true);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
 }
