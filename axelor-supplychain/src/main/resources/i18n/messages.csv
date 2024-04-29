@@ -57,6 +57,8 @@
 "Archived",,,
 "Are you sure you want to run the calculation ? Calculation can take a long time.",,,
 "Associated estimated delivery mrp line",,,
+"At least one sale order line has an empty stock location and the sale order has an empty stock location too. Please correct at least one of those errors.",,,
+"At least one sale order line has an empty stock location, if you continue they will be filled automatically.",,,
 "At least one sale order line must be selected",,,
 "At least one stock move is in litigation, do you really want to validate passed for payment ?",,,
 "Auto allocate during an availability request",,,

@@ -57,6 +57,8 @@
 "Archived","Archivé",,
 "Are you sure you want to run the calculation ? Calculation can take a long time.","Êtes-vous sûr de vouloir lancer le calcul ? Cela peut prendre un moment.",,
 "Associated estimated delivery mrp line","Ligne de livraison estimée associée",,
+"At least one sale order line has an empty stock location and the sale order has an empty stock location too. Please correct at least one of those errors.","Au moins une ligne de commande client possède un emplacement de stock vide et la commande client aussi. Merci de corriger au moins l'une de ces erreurs.",,
+"At least one sale order line has an empty stock location, if you continue they will be filled automatically.","Au moins une ligne de commande client possède un emplacement de stock vide",,
 "At least one sale order line must be selected","Au moins une ligne de commande client doit être sélectionnée",,
 "At least one stock move is in litigation, do you really want to validate passed for payment ?","Au moins une réception fournisseur est en litige pour cette facture. Voulez-vous valider ce BAP ?",,
 "Auto allocate during an availability request","Allouer automatiquement lors d'une demande de mise à disposition",,

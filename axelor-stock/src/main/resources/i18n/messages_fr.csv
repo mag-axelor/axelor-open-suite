@@ -946,6 +946,7 @@
 "You must configure a customer virtual stock location for the company %s","Veuillez configurer un Emplacement Virtuel Client pour la société %s",,
 "You must configure a default pickup stock location for the company %s","Veuillez configurer un emplacement pour l'expédition pour la société %s",,
 "You must configure a default receipt stock location for the company %s","Veuillez configurer un emplacement pour la réception pour la société %s",,
+"You must configure a default virtual outsource stock location for the company %s","Veuillez configurer un Emplacement Virtuel de stock sous-traitant par défaut pour la société %s",,
 "You must configure a supplier virtual stock location for the company %s","Veuillez configurer un Emplacement Virtuel Fournisseur pour la société %s",,
 "You must configure an inventory virtual stock location for the company %s","Veuillez configurer un Emplacement Virtuel Inventaire pour la société %s",,
 "You must select a stock location","Veuillez sélectionner un entrepôt",,
