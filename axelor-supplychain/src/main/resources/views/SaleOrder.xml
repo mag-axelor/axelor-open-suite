@@ -21,7 +21,7 @@
       <attribute name="readOnlyIf" value="statusSelect &gt; 1"/>
     </extend>
     <extend target="//panel[@name='actionsPanel']/button[@name='confirmOrderBtn']">
-      <attribute name="onClick" value="action-sale-order-group-confirm-order"/>
+      <attribute name="onClick" value="action-sale-order-group-confirm-order, action-sale-group-confirmed"/>
     </extend>
   </form>
 

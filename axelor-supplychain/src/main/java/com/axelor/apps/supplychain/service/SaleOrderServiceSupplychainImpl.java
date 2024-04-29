@@ -452,6 +452,5 @@ public class SaleOrderServiceSupplychainImpl extends SaleOrderServiceImpl
               .filter(sol -> sol.getTypeSelect() == 0 && sol.getStockLocation() == null)
               .forEach(sol -> sol.setStockLocation(saleOrder.getStockLocation()));
     }
-    saleOrderRepo.save(saleOrder);
   }
 }
