@@ -215,7 +215,7 @@
       <panel name="contentPanel" title="Content" colSpan="12">
         <spacer colSpan="9"/>
         <button name="addEstimatedReceiptDateBtn" title="Fill the estimated receipt date"
-          onClick="action-purchase-order-view-add-estimated-receipt-date" colSpan="3"/>
+          onClick="save, action-purchase-order-view-add-estimated-receipt-date" colSpan="3"/>
         <panel-related name="purchaseOrderLineListPanel" field="purchaseOrderLineList"
           canNew="statusSelect &lt; 3" canRemove="statusSelect &lt; 3"
           grid-view="purchase-order-line-purchase-order-grid" title="PO lines detail" colSpan="12"
