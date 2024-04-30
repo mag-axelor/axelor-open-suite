@@ -740,7 +740,7 @@ public class SaleOrderController {
     try {
       SaleOrder saleOrder = request.getContext().asType(SaleOrder.class);
       Beans.get(SaleOrderSupplychainService.class)
-              .setDefaultStockLocation(Beans.get(SaleOrderRepository.class).find(saleOrder.getId()));
+          .setDefaultStockLocation(Beans.get(SaleOrderRepository.class).find(saleOrder.getId()));
       response.setReload(true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);

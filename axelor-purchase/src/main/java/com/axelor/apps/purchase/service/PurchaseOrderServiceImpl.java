@@ -47,6 +47,7 @@ import com.axelor.apps.base.service.birt.template.BirtTemplateService;
 import com.axelor.apps.purchase.db.PurchaseOrder;
 import com.axelor.apps.purchase.db.PurchaseOrderLine;
 import com.axelor.apps.purchase.db.PurchaseOrderLineTax;
+import com.axelor.apps.purchase.db.repo.PurchaseOrderLineRepository;
 import com.axelor.apps.purchase.db.repo.PurchaseOrderRepository;
 import com.axelor.apps.purchase.exception.PurchaseExceptionMessage;
 import com.axelor.apps.purchase.service.app.AppPurchaseService;
@@ -57,15 +58,14 @@ import com.axelor.auth.db.User;
 import com.axelor.db.EntityHelper;
 import com.axelor.i18n.I18n;
 import com.axelor.inject.Beans;
+import com.axelor.rpc.Context;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.persist.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -518,6 +518,18 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         }
       }
       purchaseOrderRepo.save(purchaseOrder);
+    }
+  }
+
+  @Transactional
+  public void updateEstimatedReceiptDate(LocalDate estimatedReceiptDate, List<LinkedHashMap<String, Object>> polListHashMap) throws AxelorException {
+    long polId = 0L;
+    for (LinkedHashMap<String, Object> polHashMap : polListHashMap) {
+      polId = Long.parseLong(polHashMap.get("id").toString());
+      PurchaseOrderLine purchaseOrderLine =
+              Beans.get(PurchaseOrderLineRepository.class).find(polId);
+      if ((Boolean) polHashMap.get("selected"))
+        purchaseOrderLine.setEstimatedReceiptDate(estimatedReceiptDate);
     }
   }
 }

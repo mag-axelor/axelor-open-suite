@@ -66,6 +66,7 @@
     <field name="invoicingDate"
       expr="eval:__config__.app.getTodayDate(__user__.activeCompany)"/>
     <field name="duration" expr="eval:__config__.app.getApp('contract')?.getDuration()"/>
-    <field name="periodTypeSelect" expr="eval:__config__.app.getApp('contract')?.getPeriodTypeSelect()"/>
+    <field name="periodTypeSelect"
+      expr="eval:__config__.app.getApp('contract')?.getPeriodTypeSelect()"/>
   </action-record>
 </object-views>

@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://axelor.com/xml/ns/object-views http://axelor.com/xml/ns/object-views/object-views_7.0.xsd">
 
   <grid name="sale-order-line-grid" id="supplychain-sale-order-line-grid" title="SO line"
-        model="com.axelor.apps.sale.db.SaleOrderLine" extension="true">
+    model="com.axelor.apps.sale.db.SaleOrderLine" extension="true">
     <extend target="//field[@name='$nbDecimalDigitForQty']">
       <insert position="after">
         <field name="stockLocation" hidden="true"/>
@@ -100,10 +100,9 @@
     </extend>
     <extend target="//panel[@name='deliveryPanel']/field[@name='desiredDeliveryDate']">
       <insert position="before">
-        <field name="stockLocation" canEdit="false"
-               readonlyIf="saleOrder.statusSelect >= 3"
-               onSelect="action-sale-order-line-attrs-set-stock-location-domain"
-               form-view="stock-location-form" grid-view="stock-location-grid"/>
+        <field name="stockLocation" canEdit="false" readonlyIf="saleOrder.statusSelect >= 3"
+          onSelect="action-sale-order-line-attrs-set-stock-location-domain"
+          form-view="stock-location-form" grid-view="stock-location-grid"/>
       </insert>
     </extend>
   </form>
@@ -328,11 +327,11 @@
 
   <action-attrs name="action-sale-order-line-attrs-set-stock-location-domain">
     <attribute name="domain" for="stockLocation"
-               if="!__parent__.tradingName?.stockLocationList &amp;&amp; !__parent__.directOrderLocation"
-               expr="eval: &quot;self.company.id = ${__parent__?.company?.id} and self.typeSelect != 3 and self.usableOnSaleOrder = true&quot;"/>
+      if="!__parent__.tradingName?.stockLocationList &amp;&amp; !__parent__.directOrderLocation"
+      expr="eval: &quot;self.company.id = ${__parent__?.company?.id} and self.typeSelect != 3 and self.usableOnSaleOrder = true&quot;"/>
     <attribute name="domain" for="stockLocation"
-               if="!__parent__.tradingName?.stockLocationList &amp;&amp; __parent__.directOrderLocation"
-               expr="eval: &quot;self.typeSelect != 3 and self.usableOnSaleOrder = true and self.directOrderLocation = true&quot;"/>
+      if="!__parent__.tradingName?.stockLocationList &amp;&amp; __parent__.directOrderLocation"
+      expr="eval: &quot;self.typeSelect != 3 and self.usableOnSaleOrder = true and self.directOrderLocation = true&quot;"/>
   </action-attrs>
 
   <!-- ACTION METHOD -->

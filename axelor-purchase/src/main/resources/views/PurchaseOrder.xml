@@ -213,6 +213,9 @@
     <panel-tabs name="mainPanelTab"
       hideIf="supplierPartner == null || ($enablePurchasesProductByTradName &amp;&amp; company.tradingNameSet != null &amp;&amp; company.tradingNameSet.length != 0 &amp;&amp; tradingName == null)">
       <panel name="contentPanel" title="Content" colSpan="12">
+        <spacer colSpan="9"/>
+        <button name="addEstimatedReceiptDateBtn" title="Fill the estimated receipt date"
+          onClick="action-purchase-order-view-add-estimated-receipt-date" colSpan="3"/>
         <panel-related name="purchaseOrderLineListPanel" field="purchaseOrderLineList"
           canNew="statusSelect &lt; 3" canRemove="statusSelect &lt; 3"
           grid-view="purchase-order-line-purchase-order-grid" title="PO lines detail" colSpan="12"
@@ -417,6 +420,23 @@
       <mail-followers/>
     </panel-mail>
 
+  </form>
+
+  <form name="purchase-order-receipt-form" title="PO estimated receipt date"
+    model="com.axelor.apps.purchase.db.PurchaseOrder"
+    onLoad="action-purchase-order-record-fill-po-line-list">
+    <panel name="mainPanel" title="Purchase order" colSpan="12">
+      <spacer colSpan="9"/>
+      <field name="$_estimatedReceiptDate" title="Estimated receipt date" required="true"
+        type="date" colSpan="3" canEdit="true"/>
+      <field name="$_purchaseOrderLineList" title="PO lines"
+        target="com.axelor.apps.purchase.db.PurchaseOrderLine" type="many-to-many" readonly="true"
+        colSpan="12"/>
+      <spacer colSpan="3"/>
+      <button name="updatePOLEstimatedReceiptDateBtn"
+        title="Update selected purchase order lines"
+        onClick="action-purchase-order-group-update-estimated-receipt-date" colSpan="6"/>
+    </panel>
   </form>
 
   <cards name="purchase-quotations-order-cards" title="Supplier RFQ/PO"
@@ -1049,6 +1069,39 @@
     name="action-purchase-order-method-convert-selected-lines-to-merge-lines">
     <call class="com.axelor.apps.purchase.web.PurchaseOrderMergingController"
       method="convertSelectedLinesToMergeLines"/>
+  </action-method>
+
+  <action-view name="action-purchase-order-view-add-estimated-receipt-date"
+    title="PO estimated receipt date" model="com.axelor.apps.purchase.db.PurchaseOrder">
+    <view name="purchase-order-receipt-form" type="form"/>
+    <view-param name="popup" value="reload"/>
+    <view-param name="popup-save" value="false"/>
+    <view-param name="show-toolbar" value="false"/>
+    <view-param name="show-confirm" value="false"/>
+    <view-param name="forceEdit" value="true"/>
+    <context name="_showRecord" expr="eval: id"/>
+  </action-view>
+
+  <action-record name="action-purchase-order-record-fill-po-line-list"
+    model="com.axelor.apps.purchase.db.PurchaseOrder">
+    <field name="$_purchaseOrderLineList"
+      expr="eval: __repo__(PurchaseOrderLine).all().filter('self.purchaseOrder.id = ? AND self.product IS NOT NULL AND self.estimatedReceiptDate IS NULL', id).fetch()"/>
+  </action-record>
+
+  <action-group name="action-purchase-order-group-update-estimated-receipt-date">
+    <action name="action-purchase-order-validate-select-at-least-one"/>
+    <action name="action-purchase-order-method-update-estimated-receipt-date"/>
+    <action name="close"/>
+  </action-group>
+
+  <action-validate name="action-purchase-order-validate-select-at-least-one">
+    <error message="Please select at least one purchase order line"
+      if="!_purchaseOrderLineList?.any{it -> it.selected}"/>
+  </action-validate>
+
+  <action-method name="action-purchase-order-method-update-estimated-receipt-date">
+    <call class="com.axelor.apps.purchase.web.PurchaseOrderController"
+      method="updateEstimatedReceiptDate"/>
   </action-method>
 
 </object-views>

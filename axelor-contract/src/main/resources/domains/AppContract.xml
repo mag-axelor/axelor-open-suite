@@ -20,10 +20,11 @@
     <boolean name="isConfigContract" title="Configurable contract"/>
 
     <integer name="duration" title="Duration" min="0"/>
-    <integer name="periodTypeSelect" title="Period Type" selection="contract.period.type.select" default="1"/>
+    <integer name="periodTypeSelect" title="Period Type"
+      selection="contract.period.type.select" default="1"/>
 
     <many-to-one name="contractMessageTemplate" ref="com.axelor.message.db.Template"
-                 title="Message template for contract"/>
+      title="Message template for contract"/>
 
     <track>
       <field name="isUnchangableContract" on="UPDATE"/>

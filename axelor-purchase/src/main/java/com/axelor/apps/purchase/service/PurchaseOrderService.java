@@ -26,8 +26,10 @@ import com.axelor.apps.base.db.PriceList;
 import com.axelor.apps.base.db.TradingName;
 import com.axelor.apps.purchase.db.PurchaseOrder;
 import com.axelor.auth.db.User;
+import com.axelor.rpc.Context;
 import com.google.inject.persist.Transactional;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public interface PurchaseOrderService {
@@ -103,4 +105,6 @@ public interface PurchaseOrderService {
   public void updateCostPrice(PurchaseOrder purchaseOrder) throws AxelorException;
 
   void checkPrintingSettings(PurchaseOrder purchaseOrder) throws AxelorException;
+
+  void updateEstimatedReceiptDate(LocalDate estimatedReceiptDate, List<LinkedHashMap<String, Object>> polListHashMap) throws AxelorException;
 }

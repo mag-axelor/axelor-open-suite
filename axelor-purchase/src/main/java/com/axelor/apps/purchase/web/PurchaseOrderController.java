@@ -24,10 +24,7 @@ import com.axelor.apps.base.AxelorException;
 import com.axelor.apps.base.db.BankDetails;
 import com.axelor.apps.base.db.Company;
 import com.axelor.apps.base.db.Partner;
-import com.axelor.apps.base.db.repo.BlockingRepository;
-import com.axelor.apps.base.db.repo.PartnerRepository;
-import com.axelor.apps.base.db.repo.PriceListRepository;
-import com.axelor.apps.base.db.repo.TraceBackRepository;
+import com.axelor.apps.base.db.repo.*;
 import com.axelor.apps.base.service.BankDetailsService;
 import com.axelor.apps.base.service.BlockingService;
 import com.axelor.apps.base.service.PartnerPriceListService;
@@ -56,6 +53,10 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import java.lang.invoke.MethodHandles;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.slf4j.Logger;
@@ -379,6 +380,29 @@ public class PurchaseOrderController {
       purchaseOrder = Beans.get(PurchaseOrderRepository.class).find(purchaseOrder.getId());
 
       Beans.get(PurchaseOrderWorkflowService.class).draftPurchaseOrder(purchaseOrder);
+      response.setReload(true);
+    } catch (Exception e) {
+      TraceBackService.trace(response, e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public void updateEstimatedReceiptDate(ActionRequest request, ActionResponse response) {
+    try {
+      Context context = request.getContext();
+
+      Object contextEstimatedReceiptDate = context.get("_estimatedReceiptDate");
+      if (contextEstimatedReceiptDate == null) {
+        response.setError("Please select an estimated receipt date");
+        return;
+      }
+
+      LocalDate estimatedReceiptDate = LocalDate.parse(contextEstimatedReceiptDate.toString());
+      List<LinkedHashMap<String, Object>> polListHashMap =
+              (ArrayList<LinkedHashMap<String, Object>>) context.get("_purchaseOrderLineList");
+
+      Beans.get(PurchaseOrderService.class).updateEstimatedReceiptDate(estimatedReceiptDate, polListHashMap);
+
       response.setReload(true);
     } catch (Exception e) {
       TraceBackService.trace(response, e);

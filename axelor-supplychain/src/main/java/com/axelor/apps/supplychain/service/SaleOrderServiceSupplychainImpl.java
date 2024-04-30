@@ -449,8 +449,8 @@ public class SaleOrderServiceSupplychainImpl extends SaleOrderServiceImpl
     List<SaleOrderLine> saleOrderLineList = saleOrder.getSaleOrderLineList();
     if (saleOrderLineList != null) {
       saleOrderLineList.stream()
-              .filter(sol -> sol.getTypeSelect() == 0 && sol.getStockLocation() == null)
-              .forEach(sol -> sol.setStockLocation(saleOrder.getStockLocation()));
+          .filter(sol -> sol.getTypeSelect() == 0 && sol.getStockLocation() == null)
+          .forEach(sol -> sol.setStockLocation(saleOrder.getStockLocation()));
     }
   }
 }
